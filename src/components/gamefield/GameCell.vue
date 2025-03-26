@@ -1,69 +1,121 @@
 <template>
-  <div
-    class="cell"
-    :class="{ cell_revealed: isRevealed, cell_mine: isMine }"
-    @click="revealCell"
-    @contextmenu.prevent="toggleFlag"
-  >
-    <span v-if="isFlagged">
+  <div class="cell" :class="{ mine: isMine, revealed: cellState === ECellClickState.Revealed }">
+    <span v-if="cellState === ECellClickState.Flagged">
       <FlagIcon />
     </span>
-    <span v-else-if="isQuestion">
+
+    <span v-else-if="cellState === ECellClickState.Marked">
       <QuestionIcon />
     </span>
-    <span v-else-if="isRevealed && isMine">
+
+    <span v-else-if="cellState === ECellClickState.Revealed && isMine">
       <MineIcon />
     </span>
-    <span v-else-if="isRevealed && neighborMines && neighborMines > 0"> {{ neighborMines }}</span>
+
+    <span
+      :class="colorDigit"
+      v-else-if="cellState === ECellClickState.Revealed && neighborMines && neighborMines > 0"
+    >
+      {{ neighborMines }}
+    </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
+import { computed, defineProps } from 'vue'
 import FlagIcon from '@/assets/icons/flag.svg'
 import MineIcon from '@/assets/icons/mine.svg'
 import QuestionIcon from '@/assets/icons/question.svg'
+import { ECellClickState } from '@/types/game'
 
-const props = defineProps({
-  isMine: Boolean,
-  isRevealed: Boolean,
-  isFlagged: Boolean,
-  isQuestion: Boolean,
-  neighborMines: Number,
+interface Props {
+  isMine: boolean
+  cellState: ECellClickState
+  neighborMines: number
+}
+
+const props = defineProps<Props>()
+
+const colorDigit = computed(() => {
+  switch (props.neighborMines) {
+    case 1: {
+      return 'blue'
+    }
+    case 2: {
+      return 'green'
+    }
+    case 3: {
+      return 'red'
+    }
+    case 4: {
+      return 'darkblue'
+    }
+    case 5: {
+      return 'brown'
+    }
+    case 6: {
+      return 'turquoise'
+    }
+    case 8: {
+      return 'white'
+    }
+    default: {
+      return 'black'
+    }
+  }
 })
-
-const emit = defineEmits(['reveal', 'toggleFlag'])
-
-const revealCell = () => {
-  if (!props.isRevealed && !props.isFlagged) {
-    emit('reveal')
-  }
-}
-
-const toggleFlag = () => {
-  if (!props.isRevealed) {
-    emit('toggleFlag')
-  }
-}
 </script>
 
 <style scoped>
 .cell {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
+
   border: 1px solid #ccc;
+  background-color: var(--bg-color);
+  /* background-color: #302f2f; */
+
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background-color: #302f2f;
+
+  font-family: var(--game-font);
 }
 
-.cell_revealed {
+.revealed {
   background-color: #eee;
 }
 
-.cell_revealed.cell_mine {
-  background-color: #ff4444;
+.revealed.mine {
+  background-color: var(--accent-color);
+}
+
+.blue {
+  color: blue;
+}
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}
+
+.darkblue {
+  color: darkblue;
+}
+
+.brown {
+  color: brown;
+}
+
+.turquoise {
+  color: turquoise;
+}
+
+.white {
+  color: white;
 }
 </style>
