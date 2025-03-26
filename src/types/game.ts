@@ -7,6 +7,7 @@ export type cell = {
 export enum EGameState {
   NotStarted,
   Started,
+  Restarted,
   Finished,
 }
 

@@ -65,7 +65,7 @@ watch(
       startStopwatch()
     } else if (gameState === EGameState.Finished) {
       stopStopwatch()
-    } else if (gameState === EGameState.NotStarted) {
+    } else if (gameState === EGameState.Restarted) {
       stopStopwatch()
       counter = 0
       seconds.value = 0

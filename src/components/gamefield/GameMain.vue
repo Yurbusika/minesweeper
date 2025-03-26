@@ -249,7 +249,7 @@ const restartGame = () => {
       const currentCell = gamefield[r][c]
 
       currentCell.cellState = ECellClickState.NotRevealed
-      gameState.value = EGameState.NotStarted
+      gameState.value = EGameState.Restarted
     }
   }
 }
