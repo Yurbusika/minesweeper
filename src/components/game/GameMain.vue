@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref, watch } from 'vue'
+import { defineProps, onMounted, ref } from 'vue'
 import type { GameConfig } from '@/types/game'
 
 import GameTopBar from './GameTopBar.vue'
@@ -66,14 +66,6 @@ const handleGameRestartRequest = () => {
   restartGame()
   isModalOpened.value = false
 }
-
-watch(isModalOpened, () => {
-  if (isModalOpened.value) {
-    document.body.classList.add('overlay')
-  } else {
-    document.body.classList.remove('overlay')
-  }
-})
 
 onMounted(() => {
   initGame()

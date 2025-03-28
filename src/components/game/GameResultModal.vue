@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits, defineProps, watch } from 'vue'
 import useTimeInMsFormatted from '@/composables/useTimeFormatted'
 
 type Props = {
@@ -46,6 +46,14 @@ const backToSettings = () => {
 }
 
 const formattedTime = useTimeInMsFormatted(props)
+
+watch(props, () => {
+  if (props.opened) {
+    document.body.classList.add('overlay')
+  } else {
+    document.body.classList.remove('overlay')
+  }
+})
 </script>
 
 <style scoped>

@@ -3,8 +3,6 @@ const useStopwatch = () => {
   const timeInMs = ref(0)
   const timerId = ref(0)
 
-  console.log('123')
-
   const start = () => {
     timerId.value = setInterval(() => {
       timeInMs.value += 1000
