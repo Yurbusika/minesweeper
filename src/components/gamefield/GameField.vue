@@ -7,8 +7,8 @@
         :isMine="cell.isMine"
         :cellState="cell.cellState"
         :neighborMines="cell.neighborMines"
-        @click="emit('handleCellClick', { cell: { rowIndex, colIndex } })"
-        @contextmenu.prevent="emit('handleCellContextmenu', { cell: { rowIndex, colIndex } })"
+        @click="emit('cellClick', { cell: { rowIndex, colIndex } })"
+        @contextmenu.prevent="emit('cellContextmenu', { cell: { rowIndex, colIndex } })"
       />
     </div>
   </div>
@@ -17,15 +17,15 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue'
 import GameCell from './GameCell.vue'
-import type { cell } from '@/types/game'
+import type { Cell } from '@/types/game'
 
-interface Props {
-  gamefield: cell[][]
+type Props = {
+  gamefield: Cell[][]
 }
 
 const { gamefield } = defineProps<Props>()
 
-const emit = defineEmits(['handleCellClick', 'handleCellContextmenu'])
+const emit = defineEmits(['cellClick', 'cellContextmenu'])
 </script>
 
 <style scoped>
@@ -33,6 +33,7 @@ const emit = defineEmits(['handleCellClick', 'handleCellContextmenu'])
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-block: 10px 50px;
 }
 
 .gamefield__row {

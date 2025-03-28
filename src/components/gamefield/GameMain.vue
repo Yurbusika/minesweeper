@@ -1,51 +1,78 @@
 <template>
   <GameTopBar
-    :amountOfMine="amountOfMine"
-    :amountOfFlag="amountOfFlag"
-    :gameState="gameState"
-    @return-settings-screen="emit('returnSettingsScreen')"
+    :remains-mines="remainsMines"
+    :game-state="gameState"
+    :time-in-ms="timeInMs"
+    @back-to-settings="emit('backToSettings')"
     @restart-game="restartGame"
   />
+
   <GameField
     :gamefield="gamefield"
-    @handle-cell-click="handleCellClick"
-    @handle-cell-contextmenu="handleCellContextmenu"
+    @cell-click="handleCellClick"
+    @cell-contextmenu="handleCellContextmenu"
   />
-  <GameResultModal v-if="gameState === EGameState.Finished" />
+
+  <!-- :timeInMs; :opened; @close -->
+  <GameResultModal
+    :opened="isModalOpened"
+    :isGameWin="isGameWin"
+    :timeInMs="timeInMs"
+    @close="closeModal"
+    @restart-game="restartGame"
+    @back-to-settings="emit('backToSettings')"
+  />
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, reactive, ref } from 'vue'
-import type { cell } from '@/types/game'
+import { computed, defineProps, onMounted, reactive, ref, watch } from 'vue'
+import type { Cell, GameConfig } from '@/types/game'
 import { ECellClickState, EGameState } from '@/types/game'
+// import { GAME_CONFIG_PRESET } from '@/constants/game'
 
 import GameTopBar from './GameTopBar.vue'
 import GameField from './GameField.vue'
 import GameResultModal from './GameResultModal.vue'
 
-interface Props {
-  rows: number
-  cols: number
-  amountOfMine: number
+import { useLeaderboardStore } from '@/stores/leaderboard'
+// import Game from '@/core/game'
+
+type Props = {
+  config: GameConfig
 }
 
-const { rows, cols, amountOfMine } = defineProps<Props>()
+const props = defineProps<Props>()
+const { rows, cols, mines } = props.config
 
-const emit = defineEmits(['returnSettingsScreen'])
+const emit = defineEmits(['backToSettings'])
 
-const gamefield = reactive<cell[][]>([])
+const gamefield = reactive<Cell[][]>([])
 
 const gameState = ref<EGameState>(EGameState.NotStarted)
 const isGameWin = ref(false)
 
-const amountOfFlag = ref(0)
+const flags = ref(0)
+const remainsMines = computed(() => mines - flags.value)
+
+const isModalOpened = ref(false)
+const timeInMs = ref(0)
+
+// const game = reactive(new Game({ config: GAME_CONFIG_PRESET.easy }))
+
+const gameId = ref(crypto.randomUUID())
+
+const refreshGameId = () => {
+  gameId.value = crypto.randomUUID()
+}
+
+const leaderboardStore = useLeaderboardStore()
 
 const createGamefield = () => {
   for (let i = 0; i < rows; i++) {
-    const row: cell[] = []
+    const row: Cell[] = []
 
     for (let j = 0; j < cols; j++) {
-      const cell = {
+      const cell: Cell = {
         isMine: false,
         cellState: ECellClickState.NotRevealed,
         neighborMines: 0,
@@ -62,7 +89,7 @@ const placeMines = (params: { initialCell: { rowIndex: number; colIndex: number 
 
   let countPlacedMines = 0
 
-  while (countPlacedMines < amountOfMine) {
+  while (countPlacedMines < mines) {
     const row = Math.floor(Math.random() * rows)
     const col = Math.floor(Math.random() * cols)
 
@@ -115,27 +142,22 @@ const isInsideGamefield = (row: number, col: number) => {
 const revealCell = (row: number, col: number) => {
   const currentCell = gamefield[row][col]
 
+  gameState.value = EGameState.Started
+
   if (currentCell.cellState === ECellClickState.NotRevealed) {
     currentCell.cellState = ECellClickState.Revealed
 
     if (currentCell.isMine) {
-      console.log('game over')
       revealAllMines()
       gameState.value = EGameState.Finished
 
-      if (!isGameWin.value) {
-        console.log('lose')
-      }
+      isModalOpened.value = true
     } else if (currentCell.neighborMines === 0) {
       revealEmptyNeighbor(row, col)
     }
   }
 
   checkWin()
-
-  if (isGameWin.value) {
-    console.log('win')
-  }
 }
 
 const revealEmptyNeighbor = (row: number, col: number) => {
@@ -163,28 +185,25 @@ const revealAllMines = () => {
   }
 }
 
-const toggleFlag = (row: number, col: number) => {
+const changeMark = (row: number, col: number) => {
   const currentCell = gamefield[row][col]
 
   if (currentCell.cellState === ECellClickState.NotRevealed) {
     currentCell.cellState = ECellClickState.Flagged
-    amountOfFlag.value++
+    flags.value++
 
     checkWin()
-
-    if (isGameWin.value) {
-      console.log('flag-win')
-    }
   } else if (currentCell.cellState === ECellClickState.Flagged) {
     currentCell.cellState = ECellClickState.Marked
   } else if (currentCell.cellState === ECellClickState.Marked) {
     currentCell.cellState = ECellClickState.NotRevealed
-    amountOfFlag.value--
+    flags.value--
   }
 }
 
 const startGame = (params: { initialCell: { rowIndex: number; colIndex: number } }) => {
   const { rowIndex, colIndex } = params.initialCell
+  refreshGameId()
   placeMines({ initialCell: { rowIndex, colIndex } })
   calculateNeighborMines()
 }
@@ -194,6 +213,7 @@ const handleCellClick = (params: { cell: { rowIndex: number; colIndex: number } 
 
   if (gameState.value === EGameState.NotStarted) {
     startGame({ initialCell: { rowIndex, colIndex } })
+
     revealCell(rowIndex, colIndex)
     gameState.value = EGameState.Started
     return
@@ -209,7 +229,7 @@ const handleCellClick = (params: { cell: { rowIndex: number; colIndex: number } 
 const handleCellContextmenu = (params: { cell: { rowIndex: number; colIndex: number } }) => {
   const { rowIndex, colIndex } = params.cell
 
-  toggleFlag(rowIndex, colIndex)
+  changeMark(rowIndex, colIndex)
 }
 
 const checkWin = () => {
@@ -232,11 +252,11 @@ const checkWin = () => {
     }
   }
 
-  if (countFlaggedMines === amountOfMine) {
+  if (countFlaggedMines === mines) {
     return (isGameWin.value = true)
   }
 
-  if (countRevealedCells === boardSize - amountOfMine) {
+  if (countRevealedCells === boardSize - mines) {
     return (isGameWin.value = true)
   }
 
@@ -244,6 +264,12 @@ const checkWin = () => {
 }
 
 const restartGame = () => {
+  if (isModalOpened.value) {
+    isModalOpened.value = false
+  }
+
+  flags.value = 0
+
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const currentCell = gamefield[r][c]
@@ -253,6 +279,57 @@ const restartGame = () => {
     }
   }
 }
+
+const closeModal = (close: boolean) => {
+  isModalOpened.value = close
+}
+
+const timerId = ref(0)
+
+const startStopwatch = () => {
+  timerId.value = setInterval(() => {
+    timeInMs.value += 1000
+  }, 1000)
+}
+
+const stopStopwatch = () => {
+  clearInterval(timerId.value)
+}
+
+watch(gameState, () => {
+  if (gameState.value === EGameState.Started) {
+    startStopwatch()
+  } else if (gameState.value === EGameState.Finished) {
+    stopStopwatch()
+  } else if (gameState.value === EGameState.Restarted) {
+    stopStopwatch()
+    timeInMs.value = 0
+  }
+})
+
+watch(isGameWin, () => {
+  if (isGameWin.value) {
+    gameState.value = EGameState.Finished
+    isGameWin.value = true
+    isModalOpened.value = true
+
+    leaderboardStore.addResult({
+      id: gameId.value,
+      timeInMs: timeInMs.value,
+      mines: mines,
+      rows,
+      cols,
+    })
+  }
+})
+
+watch(isModalOpened, () => {
+  if (isModalOpened.value) {
+    document.body.classList.add('overlay')
+  } else {
+    document.body.classList.remove('overlay')
+  }
+})
 
 onMounted(() => {
   createGamefield()

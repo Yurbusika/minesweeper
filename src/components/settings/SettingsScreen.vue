@@ -3,21 +3,75 @@
     <h2>Выберите сложность:</h2>
 
     <div class="settings__container">
-      <button class="btn" @click="emit('selectedDifficulty', 8, 8, 10)">Простой</button>
-      <button class="btn" @click="emit('selectedDifficulty', 16, 16, 40)">Средний</button>
-      <button class="btn" @click="emit('selectedDifficulty', 32, 16, 100)">Сложный</button>
-      <button class="btn">Задать сложность</button>
+      <button class="button" @click="startEasyLevel">Простой</button>
+      <button class="button" @click="startMediumLevel">Средний</button>
+      <button class="button" @click="startHardLevel">Сложный</button>
+      <button class="button" @click="toggleModal">Задать сложность</button>
+    </div>
+
+    <div v-if="isCustomSettings" class="settings__modal">
+      <button @click="toggleModal" class="modal__button_close"></button>
+
+      <label for="rows">
+        Ширина:
+        <input class="settings__input" type="number" id="rows" v-model="rows" max="50" />
+      </label>
+
+      <label for="cols">
+        Высота:
+        <input class="settings__input" type="number" id="cols" v-model="cols" max="50" />
+      </label>
+
+      <label for="amountOfMine">
+        Количество мин:
+        <input class="settings__input" type="number" id="amountOfMine" v-model="mines" />
+      </label>
+
+      <button class="button" @click="startCustomLevel">Начать игру</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from 'vue'
+import { defineEmits, ref } from 'vue'
+import { GAME_CONFIG_PRESET } from '@/constants/game.ts'
+import type { GameConfig } from '@/types/game'
 
-const emit = defineEmits(['selectedDifficulty'])
+const emit = defineEmits(['levelSelected'])
+
+const isCustomSettings = ref(false)
+
+const rows = ref<number>(10)
+const cols = ref<number>(10)
+const mines = ref<number>(10)
+
+const toggleModal = () => {
+  isCustomSettings.value = !isCustomSettings.value
+}
+
+const startEasyLevel = () => {
+  emit('levelSelected', GAME_CONFIG_PRESET.easy)
+}
+
+const startMediumLevel = () => {
+  emit('levelSelected', GAME_CONFIG_PRESET.medium)
+}
+
+const startHardLevel = () => {
+  emit('levelSelected', GAME_CONFIG_PRESET.hard)
+}
+
+const startCustomLevel = () => {
+  const customLevel: GameConfig = {
+    rows: rows.value,
+    cols: cols.value,
+    mines: mines.value,
+  }
+  emit('levelSelected', customLevel)
+}
 </script>
 
-<style>
+<style scoped>
 .settings {
   display: flex;
   flex-direction: column;
@@ -39,7 +93,7 @@ const emit = defineEmits(['selectedDifficulty'])
   gap: 1em;
 }
 
-.btn {
+.button {
   cursor: pointer;
   padding: 1em;
   border-radius: var(--radius);
@@ -51,7 +105,47 @@ const emit = defineEmits(['selectedDifficulty'])
   transition: 0.5s;
 }
 
-.btn:hover {
+.button:hover {
   border: 2px solid var(--main-color);
+}
+
+.settings__modal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 1.5em;
+
+  background-color: var(--main-color);
+  border-radius: var(--radius);
+
+  position: absolute;
+}
+
+.settings__input {
+  border: none;
+  border-radius: var(--radius);
+  width: 60px;
+  height: 30px;
+  text-align: center;
+}
+
+.modal__button_close {
+  width: 25px;
+  height: 25px;
+  background-color: transparent;
+  border: 1px solid var(--bg-color);
+  border-radius: var(--radius);
+  cursor: pointer;
+
+  padding: 0;
+
+  position: absolute;
+  top: 9px;
+  right: 13px;
+}
+
+.modal__button_close::before {
+  content: '╳';
 }
 </style>

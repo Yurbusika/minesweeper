@@ -1,20 +1,20 @@
 <template>
   <div class="cell" :class="{ mine: isMine, revealed: cellState === ECellClickState.Revealed }">
     <span v-if="cellState === ECellClickState.Flagged">
-      <FlagIcon />
+      <FlagIcon class="cell_icon" />
     </span>
 
     <span v-else-if="cellState === ECellClickState.Marked">
-      <QuestionIcon />
+      <QuestionIcon class="cell_icon" />
     </span>
 
     <span v-else-if="cellState === ECellClickState.Revealed && isMine">
-      <MineIcon />
+      <MineIcon class="cell_icon" />
     </span>
 
     <span
       :class="colorDigit"
-      v-else-if="cellState === ECellClickState.Revealed && neighborMines && neighborMines > 0"
+      v-else-if="cellState === ECellClickState.Revealed && neighborMines > 0"
     >
       {{ neighborMines }}
     </span>
@@ -73,7 +73,6 @@ const colorDigit = computed(() => {
 
   border: 1px solid #ccc;
   background-color: var(--bg-color);
-  /* background-color: #302f2f; */
 
   display: flex;
   align-items: center;
@@ -81,6 +80,7 @@ const colorDigit = computed(() => {
   cursor: pointer;
 
   font-family: var(--game-font);
+  padding: 3px;
 }
 
 .revealed {
@@ -117,5 +117,25 @@ const colorDigit = computed(() => {
 
 .white {
   color: white;
+}
+
+.cell_icon {
+  max-width: 100%;
+}
+
+@media (width < 600px) {
+  .cell {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+@media (width < 400px) {
+  .cell {
+    font-size: 0.75em;
+    width: 19px;
+    height: 19px;
+    padding: 1px;
+  }
 }
 </style>

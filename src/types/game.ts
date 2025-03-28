@@ -1,4 +1,4 @@
-export type cell = {
+export type Cell = {
   isMine: boolean
   cellState: ECellClickState
   neighborMines: number
@@ -16,4 +16,10 @@ export enum ECellClickState {
   Revealed,
   Flagged,
   Marked,
+}
+
+export type GameConfig = {
+  rows: number
+  cols: number
+  mines: number
 }

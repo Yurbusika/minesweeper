@@ -7,3 +7,7 @@
   background-color: var(--bg-light-color);
   border-radius: var(--radius);
 }
+
+body.overlay {
+  overflow: hidden;
+}
