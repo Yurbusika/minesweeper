@@ -14,17 +14,17 @@
 
       <label for="rows">
         Ширина:
-        <input class="settings__input" type="number" id="rows" v-model="rows" max="50" />
+        <input class="settings__input" type="number" id="rows" v-model="rows" max="32" />
       </label>
 
       <label for="cols">
         Высота:
-        <input class="settings__input" type="number" id="cols" v-model="cols" max="50" />
+        <input class="settings__input" type="number" id="cols" v-model="cols" max="32" />
       </label>
 
       <label for="amountOfMine">
         Количество мин:
-        <input class="settings__input" type="number" id="amountOfMine" v-model="mines" />
+        <input class="settings__input" type="number" id="amountOfMine" v-model="mines" max="100" />
       </label>
 
       <button class="button" @click="startCustomLevel">Начать игру</button>
