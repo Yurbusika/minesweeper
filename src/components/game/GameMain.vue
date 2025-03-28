@@ -31,7 +31,7 @@ import GameTopBar from './GameTopBar.vue'
 import GameField from './GameField.vue'
 import GameResultModal from './GameResultModal.vue'
 
-import useGame from '@/composables/useGame'
+import useGame from '@/composables/useGame.ts'
 
 type Props = {
   config: GameConfig

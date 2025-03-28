@@ -1,7 +1,7 @@
 import { useLeaderboardStore } from '@/stores/leaderboard'
 import { ECellClickState, EGameState, type Cell, type GameConfig } from '@/types/game'
 import { computed, reactive, ref, watch } from 'vue'
-import useStopwatch from '../useStopwatch'
+import useStopwatch from './useStopwatch'
 
 type Props = { config: GameConfig; onGameFinished: (state: EGameState) => void }
 

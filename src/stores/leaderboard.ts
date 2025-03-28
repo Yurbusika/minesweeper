@@ -29,11 +29,13 @@ export const useLeaderboardStore = defineStore(LEADERBOARD_STORAGE_KEY, () => {
   }
 
   const getSortedLeaderboard = computed(() => {
-    return leaderboard.sort((a, b) => {
-      if (a.timeInMs > b.timeInMs) return 1
-      if (a.timeInMs < b.timeInMs) return -1
-      return 0
-    })
+    return leaderboard
+      .sort((a, b) => {
+        if (a.timeInMs > b.timeInMs) return 1
+        if (a.timeInMs < b.timeInMs) return -1
+        return 0
+      })
+      .slice(0, 10)
   })
 
   return { leaderboard, addResult, getSortedLeaderboard }
