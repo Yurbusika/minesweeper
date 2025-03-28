@@ -5,12 +5,12 @@
       <button @click="emit('close')" class="modal__button_close"></button>
 
       <div v-if="isGameWin">
-        <h2>Поздравляю!</h2>
-        <p>Время игры: {{ formattedTime }} секунд</p>
+        <h2 class="modal__heading">Поздравляю!</h2>
+        <p class="modal__time">Время игры: {{ formattedTime }} секунд</p>
       </div>
 
       <div v-else>
-        <h2>Вы проиграли!</h2>
+        <h2 class="modal__heading">Вы проиграли!</h2>
       </div>
 
       <div class="modal_button_container">
@@ -109,6 +109,16 @@ const formattedTime = useTimeInMsFormatted(props)
 
 .modal__button_close::before {
   content: '╳';
+}
+
+.modal__heading {
+  font-family: var(--main-font);
+  text-align: center;
+}
+
+.modal__time {
+  font-family: var(--main-font);
+  text-align: center;
 }
 
 .modal_button_container {

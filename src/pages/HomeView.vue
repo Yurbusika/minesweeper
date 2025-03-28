@@ -9,7 +9,7 @@
 import { ref } from 'vue'
 
 import SettingsScreen from '@/components/settings/SettingsScreen.vue'
-import GameMain from '@/components/gamefield/GameMain.vue'
+import GameMain from '@/components/game/GameMain.vue'
 import type { GameConfig } from '@/types/game'
 
 const isGameStart = ref(false)

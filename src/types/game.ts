@@ -4,6 +4,8 @@ export type Cell = {
   neighborMines: number
 }
 
+export type Gamefield = Cell[][]
+
 export enum EGameState {
   NotStarted,
   Started,
