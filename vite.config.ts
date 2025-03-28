@@ -6,7 +6,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import svgLoader from 'vite-svg-loader'
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/',
+  base: '/minesweeper',
   plugins: [vue(), vueDevTools(), svgLoader({ defaultImport: 'component' })],
   resolve: {
     alias: {
